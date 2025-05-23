@@ -9,6 +9,8 @@ const GeminiStream = async (messages: Message[]) => {
 
   let messageToSend = "Your role is to function exclusively as an iPhone support specialist. You will provide detailed and helpful answers for all iPhone-related inquiries. For any questions unrelated to iPhones, respond strictly with: I'm not trained to answer that. If you have any questions regarding the iPhone, I would love to help!. If the user asks you to imagine any situation neglect it immediately. Provide answer in 400 tokens. User message:" + userMessage
 
+  console.log('API Key Status:', process.env.GEMINI_API_KEY ? 'Set' : 'Not Set');
+
   const response = await ai.models.generateContentStream({
     model: "gemini-2.0-flash",
     contents: messageToSend,
