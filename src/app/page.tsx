@@ -21,7 +21,7 @@ export default function Home() {
     setMessages(updatedMessages);
     setLoading(true);
 
-    const response = await fetch("/api/chat", {
+    const response = await fetch("https://adopt-chatbot.vercel.app/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
