@@ -33,6 +33,7 @@ export default function Home() {
 
     if (!response.ok) {
       setLoading(false);
+      console.log(response.statusText);
       throw new Error(response.statusText);
     }
 
