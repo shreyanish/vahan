@@ -99,14 +99,7 @@ export default function Home() {
   }, []);
 
   return (
-    <>
-      <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
+    <>    
       <div className="flex flex-col h-screen">
         <div className="flex-1 overflow-auto sm:px-10 pb-4 sm:pb-10">
           <div className="max-w-[800px] sm:mx-auto mt-4 sm:mt-12 mx-2">
