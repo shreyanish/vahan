@@ -7,7 +7,21 @@ interface Props {
 }
 
 export const ChatInput: FC<Props> = ({ onSend }) => {
-  const [content, setContent] = useState<string>();
+  const [content, setContent] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (text) {
+        onSend({ role: "user", content: `Document uploaded: ${file.name}\n\n${text}` });
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -45,21 +59,42 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
   }, [content]);
 
   return (
-    <div className="relative">
-      <textarea
-        ref={textareaRef}
-        className="min-h-[44px] rounded-lg pl-4 pr-12 py-2 w-full focus:outline-none focus:ring-1 focus:ring-neutral-300 border-2 border-neutral-200"
-        style={{ resize: "none" }}
-        placeholder="Type a message..."
-        value={content}
-        rows={1}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
-
-      <button onClick={() => handleSend()}>
-        <IconArrowUp className="absolute right-2 bottom-3 h-8 w-8 hover:cursor-pointer rounded-full p-1 bg-blue-500 text-white hover:opacity-80" />
-      </button>
+    <div className="relative w-full bg-white rounded-lg border-2 border-neutral-200 hover:border-neutral-300 transition-colors">
+      <div className="flex items-center p-2 gap-2">
+        <label htmlFor="file-upload" className="flex items-center justify-center h-8 w-8 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full cursor-pointer transition-colors shrink-0">
+          <span className="text-xl font-medium">+</span>
+          <input
+            id="file-upload"
+            type="file"
+            accept=".txt,.pdf,.doc,.docx,.md,.csv,.json"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+        </label>
+        
+        <div className="flex-grow relative">
+          <textarea
+            ref={textareaRef}
+            className="w-full min-h-[40px] py-2 px-3 focus:outline-none rounded-md bg-neutral-50"
+            style={{ resize: "none" }}
+            placeholder="Type a message..."
+            value={content}
+            rows={1}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+          />
+          {fileName && (
+            <span className="absolute -top-5 left-0 text-xs text-gray-500">{fileName}</span>
+          )}
+        </div>
+        
+        <button 
+          onClick={() => handleSend()} 
+          className="shrink-0 rounded-full p-2 bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+        >
+          <IconArrowUp className="h-5 w-5" />
+        </button>
+      </div>
     </div>
   );
 };

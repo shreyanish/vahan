@@ -10,9 +10,10 @@ interface Props {
   loading: boolean;
   onSend: (message: Message) => void;
   onReset: () => void;
+  onFeedback: (messageId: string, isGood: boolean) => void;
 }
 
-export const Chat: FC<Props> = ({ messages, loading, onSend, onReset }) => {
+export const Chat: FC<Props> = ({ messages, loading, onSend, onReset, onFeedback }) => {
   return (
     <>
       <div className="flex flex-row justify-between items-center mb-4 sm:mb-8">
@@ -25,7 +26,7 @@ export const Chat: FC<Props> = ({ messages, loading, onSend, onReset }) => {
             key={index}
             className="my-1 sm:my-1.5"
           >
-            <ChatMessage message={message} />
+            <ChatMessage message={message} onFeedback={onFeedback} />
           </div>
         ))}
 

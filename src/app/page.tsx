@@ -15,6 +15,54 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleFeedback = async (messageId: string, isGood: boolean) => {
+    const timestamp = new Date();
+    
+    setMessages(prevMessages => {
+      // Find the assistant message and the user query that preceded it
+      const assistantMessageIndex = prevMessages.findIndex(msg => 
+        msg.content === messageId && msg.role === 'assistant'
+      );
+      const userQuery = assistantMessageIndex > 0 ? prevMessages[assistantMessageIndex - 1].content : '';
+      
+      // Update the message with feedback
+      return prevMessages.map(msg => 
+        msg.content === messageId 
+          ? { ...msg, feedback: { isGood, timestamp } }
+          : msg
+      );
+    });
+
+    // If the feedback is negative, log it to Google Sheets
+    if (!isGood) {
+      try {
+        // Find the associated user query
+        const assistantMessageIndex = messages.findIndex(msg => 
+          msg.content === messageId && msg.role === 'assistant'
+        );
+        const userQuery = assistantMessageIndex > 0 ? messages[assistantMessageIndex - 1].content : '';
+
+        const response = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userQuery,
+            botResponse: messageId,
+            timestamp: timestamp.toISOString(),
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Failed to log negative feedback');
+        }
+      } catch (error) {
+        console.error('Error logging negative feedback:', error);
+      }
+    }
+  };
+
   const handleSend = async (message: Message) => {
     const updatedMessages = [...messages, message];
 
@@ -81,7 +129,7 @@ export default function Home() {
     setMessages([
       {
         role: "assistant",
-        content: `Hi there! I'm an iPhone Support Assistant. How can I help you today?`,
+        content: `Hi there! How can I help you today?`,
       },
     ]);
   };
@@ -94,7 +142,7 @@ export default function Home() {
     setMessages([
       {
         role: "assistant",
-        content: `Hi there! I'm an iPhone Support Assistant. How can I help you today?`,
+        content: `Hi there! How can I help you today?`,
       },
     ]);
   }, []);
@@ -109,6 +157,7 @@ export default function Home() {
               loading={loading}
               onSend={handleSend}
               onReset={handleReset}
+              onFeedback={handleFeedback}
             />
             <div ref={messagesEndRef} />
           </div>
